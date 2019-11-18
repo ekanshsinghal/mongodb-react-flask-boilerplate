@@ -4,10 +4,11 @@ import { connect } from 'react-redux';
 import { Container, TextField, Button, withStyles, Typography, Link } from '@material-ui/core';
 
 import { loginUser } from '../../actions/auth';
+import { validateEmail } from '../../utilities/formValidation';
 
 const mapDispatchToProps = dispatch => {
 	return {
-		loginUser: (obj) => dispatch(loginUser(obj)),
+		loginUser: (email, password) => dispatch(loginUser(email, password)),
 	}
 }
 
@@ -38,6 +39,9 @@ const styles = theme => ({
 	link: {
 		cursor: 'pointer',
 		fontWeight: 'bold'
+	},
+	errorContainer: {
+		marginTop: theme.spacing(2)
 	}
 });
 
@@ -48,21 +52,32 @@ class Login extends React.Component {
 	};
 
 	onChangeValue = e => {
-		this.setState({ [e.target.id]: e.target.value})
+		this.setState({ [e.target.id]: e.target.value, errors: null, invalidEmail: null})
+	}
+
+	onBlurEmail = () => {
+		this.setState({invalidEmail: !validateEmail(this.state.email)})
 	}
 
 	onLogin = () => {
-		this.props.loginUser({email: this.state.email, password: this.state.password});
+		if(!this.state.invalidEmail && this.state.email.length > 0 && this.state.password.length > 0 ) {
+			this.props.loginUser(this.state.email, this.state.password);
+		} else {
+			this.setState({errors: 'Invalid Email or Password'})
+		}
 	};
 
 	render () {
-		const {classes} = this.props;
+		const { classes } = this.props;
 		return (
 			<div className={classes.loginConatiner}>
 				<Container maxWidth='xs' className={classes.formContainer}>
+					<Typography color='error' variant='h6' className={classes.errorContainer}>{this.state.errors}</Typography>
 					<TextField 
 						value={this.state.email}
 						onChange={this.onChangeValue}
+						onBlur={this.onBlurEmail}
+						error={this.state.invalidEmail ? true : false}
 						id='email'
 						label='E-mail'
 						className={classes.textField}

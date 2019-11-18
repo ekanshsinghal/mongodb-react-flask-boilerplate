@@ -17,7 +17,6 @@ export const validateSavedToken = token => dispatch => {
 	return validate_token(token).then(response => {
 		if (response.data.token_is_valid) {
 			dispatch(loginUserSuccess(token));
-			history.push('/main');
 			localStorage.setItem("jwtToken", token);
 		} else {
 			dispatch(loginUserFailure({
@@ -43,7 +42,7 @@ export const loginUserSuccess = token => {
 }
 
 
-export function loginUserFailure(error) {
+export const loginUserFailure = error => {
 	localStorage.removeItem('token');
 	return {
 		type: LOGIN_USER_FAILURE,
@@ -54,39 +53,39 @@ export function loginUserFailure(error) {
 	};
 }
 
-export function loginUserRequest() {
+export const loginUserRequest = () => {
 	return {
 		type: LOGIN_USER_REQUEST,
 	};
 }
 
-export function logout() {
-	localStorage.removeItem('token');
+export const logout = () => {
+	localStorage.removeItem('jwtToken');
 	return {
 		type: LOGOUT_USER,
 	};
 }
 
-export function logoutAndRedirect() {
+export const logoutAndRedirect = () => {
 	return (dispatch) => {
 		dispatch(logout());
 		history.push('/');
 	};
 }
 
-export function redirectToRoute(route) {
+export const redirectToRoute = route => {
 	return () => {
 		history.push(route);
 	};
 }
 
-export const loginUser = (obj) => dispatch => {
+export const loginUser = (email, password) => dispatch => {
 	dispatch(loginUserRequest());
-	return get_token(obj.email, obj.password)
+	return get_token(email, password)
 		.then(response => {
 			try {
 				dispatch(loginUserSuccess(response.data.token));
-				history.push('/main');
+				history.push('/home');
 				localStorage.setItem("jwtToken", response.data.token);
 			} catch (e) {
 				alert(e);
@@ -106,13 +105,13 @@ export const loginUser = (obj) => dispatch => {
 }
 
 
-export function registerUserRequest() {
+export const registerUserRequest = () => {
 	return {
 		type: REGISTER_USER_REQUEST,
 	};
 }
 
-export function registerUserSuccess(token) {
+export const registerUserSuccess = token => {
 	localStorage.setItem('token', token);
 	return {
 		type: REGISTER_USER_SUCCESS,
@@ -122,7 +121,7 @@ export function registerUserSuccess(token) {
 	};
 }
 
-export function registerUserFailure(error) {
+export const registerUserFailure = error => {
 	localStorage.removeItem('token');
 	return {
 		type: REGISTER_USER_FAILURE,
@@ -133,27 +132,25 @@ export function registerUserFailure(error) {
 	};
 }
 
-export function registerUser(email, password) {
-	return function (dispatch) {
-		dispatch(registerUserRequest());
-		return create_user(email, password)
-			.then(response => {
-				try {
-					dispatch(registerUserSuccess(response.data.token));
-					history.push('/main');
-				} catch (e) {
-					dispatch(registerUserFailure({
-						response: {
-							data: {
-								status: 403,
-								statusText: 'Invalid token'
-							}
+export const registerUser = (email, password) => dispatch => {
+	dispatch(registerUserRequest());
+	return create_user(email, password)
+		.then(response => {
+			try {
+				dispatch(registerUserSuccess(response.data.token));
+				history.push('/home');
+			} catch (e) {
+				dispatch(registerUserFailure({
+					response: {
+						data: {
+							status: 403,
+							statusText: 'Invalid token'
 						}
-					}));
-				}
-			})
-			.catch(error => {
-				dispatch(registerUserFailure(error));
-			});
-	};
+					}
+				}));
+			}
+		})
+		.catch(error => {
+			dispatch(registerUserFailure(error));
+		});
 }

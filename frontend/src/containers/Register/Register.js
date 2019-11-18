@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Container, TextField, Button, withStyles, Typography, Link } from '@material-ui/core';
 
 import { registerUser } from '../../actions/auth';
+import { validateEmail } from '../../utilities/formValidation';
 
 const mapDispatchToProps = dispatch => {
 	return {
@@ -12,7 +13,7 @@ const mapDispatchToProps = dispatch => {
 }
 
 const styles = theme => ({
-	loginConatiner: {
+	registerConatiner: {
 		display: 'flex',
 		alignItems: 'center',
 		minHeight: window.innerHeight
@@ -27,7 +28,7 @@ const styles = theme => ({
 			borderRadius: '6px'
 		},
 	},
-	loginButton: {
+	registerButton: {
 		marginTop: theme.spacing(3),
 		marginBottom: theme.spacing(3),
 		width: '100%',
@@ -38,31 +39,46 @@ const styles = theme => ({
 	link: {
 		cursor: 'pointer',
 		fontWeight: 'bold'
+	},
+	errorContainer: {
+		marginTop: theme.spacing(2)
 	}
 });
 
 class Register extends React.Component {
 	state = {
 		email: '',
-		password: ''
+		password: '',
+		password2: ''
 	};
 
 	onChangeValue = e => {
-		this.setState({ [e.target.id]: e.target.value})
+		this.setState({ [e.target.id]: e.target.value, errors: null, invalidEmail: null})
+	}
+
+	onBlurEmail = () => {
+		this.setState({invalidEmail: !validateEmail(this.state.email)})
 	}
 
 	onLogin = () => {
-		this.props.loginUser({email: this.state.email, password: this.state.password});
+		if(!this.state.invalidEmail && this.state.email.length > 0 && this.state.password.length > 0 && this.state.password === this.state.password2) {
+			this.props.loginUser({email: this.state.email, password: this.state.password});
+		} else {
+			this.setState({errors: 'Invalid Email or Password'})
+		}
 	};
 
 	render () {
 		const {classes} = this.props;
 		return (
-			<div className={classes.loginConatiner}>
+			<div className={classes.registerConatiner}>
 				<Container maxWidth='xs' className={classes.formContainer}>
+					<Typography color='error' variant='h6' className={classes.errorContainer}>{this.state.errors}</Typography>
 					<TextField 
 						value={this.state.email}
 						onChange={this.onChangeValue}
+						onBlur={this.onBlurEmail}
+						error={this.state.invalidEmail ? true : false}
 						id='email'
 						label='E-mail'
 						className={classes.textField}
@@ -80,7 +96,7 @@ class Register extends React.Component {
 					<TextField
 						value={this.state.password}
 						onChange={this.onChangeValue}
-						id='password'
+						id='password2'
 						label='Confirm Password'
 						type="password"
 						className={classes.textField}
@@ -88,7 +104,7 @@ class Register extends React.Component {
 					/>
 					<Button
 						onClick={this.onLogin}
-						className={classes.loginButton}
+						className={classes.registerButton}
 						variant="contained"
 						color="primary"
 					>
