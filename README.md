@@ -12,7 +12,9 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ### `cd frontend`
 ### `npm start`
 
-## Build app for production
+Open link http://localhost:5000 in your browser
+
+## Build front-end for production
 
 ### `cd frontend`
 ### `npm run build`
