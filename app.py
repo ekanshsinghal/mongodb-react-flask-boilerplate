@@ -8,11 +8,14 @@ from config import BaseConfig
 from models import *
 
 FORTNIGHTLY = 1296000
-app = Flask(__name__, static_folder="../front/build")
+app = Flask(__name__, static_folder="./frontend/build")
 
-# Database connection
-app.config.from_object(BaseConfig)
-db = MongoEngine(app)
+try:
+	# Database connection
+	app.config.from_object(BaseConfig)
+	db = MongoEngine(app)
+except Exception as e:
+	print(e)
 
 # Salt user password
 bcrypt = Bcrypt(app)

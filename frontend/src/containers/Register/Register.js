@@ -60,9 +60,9 @@ class Register extends React.Component {
 		this.setState({invalidEmail: !validateEmail(this.state.email)})
 	}
 
-	onLogin = () => {
+	onRegister = () => {
 		if(!this.state.invalidEmail && this.state.email.length > 0 && this.state.password.length > 0 && this.state.password === this.state.password2) {
-			this.props.loginUser({email: this.state.email, password: this.state.password});
+			this.props.registerUser({email: this.state.email, password: this.state.password});
 		} else {
 			this.setState({errors: 'Invalid Email or Password'})
 		}
@@ -94,7 +94,7 @@ class Register extends React.Component {
 						variant="outlined"
 					/>
 					<TextField
-						value={this.state.password}
+						value={this.state.password2}
 						onChange={this.onChangeValue}
 						id='password2'
 						label='Confirm Password'
@@ -103,7 +103,7 @@ class Register extends React.Component {
 						variant="outlined"
 					/>
 					<Button
-						onClick={this.onLogin}
+						onClick={this.onRegister}
 						className={classes.registerButton}
 						variant="contained"
 						color="primary"
